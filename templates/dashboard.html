@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard - Bug Tracker</title>
+</head>
+<body>
+    <h2>Welcome to Bug Tracker</h2>
+    <a href="/logout">Logout</a>
+    <h3>Report a New Bug</h3>
+    <form method="post" action="/report">
+        Title: <input type="text" name="title" required><br>
+        Description:<br><textarea name="description" rows="4" cols="50" required></textarea><br>
+        Priority: 
+        <select name="priority">
+            <option>Low</option>
+            <option>Medium</option>
+            <option>High</option>
+        </select><br><br>
+        <input type="submit" value="Submit Bug">
+    </form>
+
+    <h3>Existing Bugs</h3>
+    <ul>
+        {% for bug in bugs %}
+            <li><strong>{{ bug.title }}</strong> - {{ bug.status }} ({{ bug.priority }})</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
