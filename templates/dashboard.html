@@ -1,29 +1,133 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Dashboard - Bug Tracker</title>
+  <meta charset="UTF-8">
+  <title>Car Leasing Dashboard</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f7f9fc;
+      color: #333;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+    }
+    .summary, .lessee-section {
+      max-width: 900px;
+      margin: 20px auto;
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .summary h2, .lessee-section h2 {
+      color: #34495e;
+    }
+    .summary p {
+      font-size: 16px;
+      margin: 10px 0;
+    }
+    .btn {
+      display: inline-block;
+      padding: 10px 18px;
+      margin: 10px 0;
+      background-color: #2980b9;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+    }
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    th {
+      background-color: #f0f4f8;
+    }
+    form button {
+      background: #27ae60;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    form button:hover {
+      background: #219150;
+    }
+    .overdue {
+      color: red;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
-    <h2>Welcome to Bug Tracker</h2>
-    <a href="/logout">Logout</a>
-    <h3>Report a New Bug</h3>
-    <form method="post" action="/report">
-        Title: <input type="text" name="title" required><br>
-        Description:<br><textarea name="description" rows="4" cols="50" required></textarea><br>
-        Priority: 
-        <select name="priority">
-            <option>Low</option>
-            <option>Medium</option>
-            <option>High</option>
-        </select><br><br>
-        <input type="submit" value="Submit Bug">
-    </form>
+  <h1>Car Leasing Dashboard</h1>
 
-    <h3>Existing Bugs</h3>
-    <ul>
-        {% for bug in bugs %}
-            <li><strong>{{ bug.title }}</strong> - {{ bug.status }} ({{ bug.priority }})</li>
+  <div class="summary">
+    <h2>Summary</h2>
+    <p><strong>Total Collected:</strong> ₹{{ total_collected }}</p>
+    <p><strong>Total Expected:</strong> ₹{{ total_expected }}</p>
+    <p><strong>Leased Vehicles:</strong> {{ leased }}</p>
+    <p><strong>Available Vehicles:</strong> {{ available }}</p>
+    <a class="btn" href="{{ url_for('register') }}">Register New Lessee</a>
+  </div>
+
+  <div class="lessee-section">
+    <h2>Overdue Lessees</h2>
+    {% if overdue %}
+      <ul class="overdue">
+        {% for name in overdue %}
+          <li>{{ name }}</li>
         {% endfor %}
-    </ul>
+      </ul>
+    {% else %}
+      <p>No overdue payments 🎉</p>
+    {% endif %}
+  </div>
+
+  <div class="lessee-section">
+    <h2>All Lessees</h2>
+    {% if lessees %}
+    <table>
+      <tr>
+        <th>Name</th>
+        <th>Vehicle ID</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Payments</th>
+        <th>Pay</th>
+      </tr>
+      {% for name, info in lessees.items() %}
+        <tr>
+          <td>{{ name }}</td>
+          <td>{{ info.vehicle_id }}</td>
+          <td>{{ info.email }}</td>
+          <td>{{ info.phone }}</td>
+          <td>
+            {% for p in payments[name] %}
+              ₹{{ p.amount }} ({{ p.date }})<br>
+            {% endfor %}
+          </td>
+          <td>
+            <form action="{{ url_for('pay', lessee=name) }}" method="POST">
+              <button type="submit">Pay ₹{{ LEASE_AMOUNT }}</button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+    </table>
+    {% else %}
+      <p>No lessees registered yet.</p>
+    {% endif %}
+  </div>
 </body>
 </html>
